@@ -1,5 +1,6 @@
 #! /usr/bin/env ruby
 
+require 'pry'
 require 'open3'
 require 'colorize'
 
@@ -38,15 +39,20 @@ class LogCropper
   def log(command, command_no, result)
     return if @only_fail and result.ok?
     puts
-    put_line "command ##{command_no}"
-    puts command
-    put_line
+    put_command_header(command, command_no, result)
     puts get_log
     puts
     clear_log
   end
 
   protected
+
+  def put_command_header(command, command_no, result)
+    put_line "command ##{command_no}"
+    puts command
+    puts result.stdout.split("\n")
+    put_line
+  end
 
   def put_line(text="")
     text = " #{text} " unless text.empty?
@@ -87,7 +93,6 @@ class LogCropper
 end
 
 
-
 def indent_puts(str)
   indent = "   "*@current_section.size
 
@@ -124,8 +129,8 @@ def hammer(*args)
   original_args = args.clone
   original_args.unshift("hammer")
 
-  #args.unshift("hammer")
-  args = ["scl", "enable", "ruby193", "cd /root/hammer/hammer-cli/; bundle exec './bin/hammer "+ args.join(" ") +"'"]
+  args.unshift("./hammer")
+  #args = ["cd /root/hammer/hammer-cli/; bundle exec './bin/hammer "+ args.join(" ") +"'"]
 
   Open3.popen3(*args) do |stdin, stdout, stderr, wait_thr|
     result.stdout = stdout.readlines.join("")
@@ -133,7 +138,10 @@ def hammer(*args)
     result.code = wait_thr.value.exitstatus.to_i
   end
 
-  indent_puts original_args.join(" ") + "    [command ##{@command_cnt}]".cyan
+  cmd = original_args.join(" ")
+  cmd = cmd[0, 60] + " ..." if cmd.length > 64
+
+  indent_puts cmd + "    [command ##{@command_cnt}]".cyan
   unless result.ok?
     indent_puts result.stderr.rstrip.blue
   end
@@ -227,7 +235,6 @@ class ShowOutput < Output
 
 end
 
-require 'pry'
 
 RAND = Random.rand(100).to_s
 org_name = "Org"+RAND
@@ -266,7 +273,7 @@ end
 section "operating system" do
 
   section "create" do
-    simple_test "os", "create", "--name", os_name, "--major", '6'
+    simple_test "os", "create", "--name", os_name, "--major", '6', "--minor", "3"
   end
 
 end
@@ -302,6 +309,10 @@ section "deletions" do
 
   section "organization" do
     simple_test "organization", "delete", "--name", org_name
+  end
+
+  section "user" do
+    simple_test "user", "delete", "--login", user[:login]
   end
 
 end

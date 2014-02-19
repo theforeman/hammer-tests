@@ -1,0 +1,3 @@
+cd /root/hammer/hammer-cli/; 
+
+bundle exec "./bin/hammer $*"
