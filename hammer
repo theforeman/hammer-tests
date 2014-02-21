@@ -1,3 +1,3 @@
 cd /root/hammer/hammer-cli/; 
 
-rvm system do bundle exec "./bin/hammer $*"
+bundle exec "./bin/hammer $*"

@@ -64,7 +64,7 @@ def hammer(*args)
   original_args = args.clone
   original_args.unshift("hammer")
 
-  args.unshift("hammer")
+  args.unshift(File.join(File.dirname(__FILE__)) + "/hammer")
   #args = ["cd /root/hammer/hammer-cli/; bundle exec './bin/hammer "+ args.join(" ") +"'"]
 
   unless DUMMY_RUN
