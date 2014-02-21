@@ -1,8 +1,13 @@
 #! /usr/bin/env ruby
 
 require 'pry'
-require 'open3'
+require 'open4'
 require 'colorize'
+require './loggers.rb'
+require './output.rb'
+
+#DUMMY_RUN = true
+DUMMY_RUN = false
 
 class CommandResult
 
@@ -20,77 +25,7 @@ class CommandResult
 end
 
 
-class LogCropper
 
-  def initialize(log_file, target_file, only_fail=false)
-    @log_file = log_file
-    @target_file = target_file
-    @only_fail = only_fail
-    clear_log
-    clear_target
-  end
-
-  def put_header
-    put_line
-    put_line "Tests started at: " + Time.now.strftime("%Y/%m/%d %H:%M:%S")
-    put_line
-  end
-
-  def log(command, command_no, result)
-    return if @only_fail and result.ok?
-    puts
-    put_command_header(command, command_no, result)
-    puts get_log
-    puts
-    clear_log
-  end
-
-  protected
-
-  def put_command_header(command, command_no, result)
-    put_line "command ##{command_no}"
-    puts command
-    puts result.stdout.split("\n")
-    put_line
-  end
-
-  def put_line(text="")
-    text = " #{text} " unless text.empty?
-    length = 100 - text.length
-
-    line = "--#{text}" + "-"*length
-    puts line % text
-  end
-
-  def log_file_path
-    File.expand_path(@log_file)
-  end
-
-  def target_file_path
-    File.expand_path(@target_file)
-  end
-
-  def get_log
-    File.readlines(log_file_path)
-  end
-
-  def clear_log
-    File.open(log_file_path, 'w') do |f|
-    end
-  end
-
-  def clear_target
-    File.open(target_file_path, 'w') do |f|
-    end
-  end
-
-  def puts(*args)
-    File.open(target_file_path, "a") do |f|
-      f.puts(*args)
-    end
-  end
-
-end
 
 
 def indent_puts(str)
@@ -129,13 +64,18 @@ def hammer(*args)
   original_args = args.clone
   original_args.unshift("hammer")
 
-  args.unshift("./hammer")
+  args.unshift("hammer")
   #args = ["cd /root/hammer/hammer-cli/; bundle exec './bin/hammer "+ args.join(" ") +"'"]
 
-  Open3.popen3(*args) do |stdin, stdout, stderr, wait_thr|
-    result.stdout = stdout.readlines.join("")
-    result.stderr = stderr.readlines.join("")
-    result.code = wait_thr.value.exitstatus.to_i
+  unless DUMMY_RUN
+    # Open3.popen3(*args) do |stdin, stdout, stderr, wait_thr|
+    status = Open4.popen4(*args) do |pid, stdin, stdout, stderr|
+      result.stdout = stdout.readlines.join("")
+      result.stderr = stderr.readlines.join("")
+    end
+    result.code = status.exitstatus.to_i
+  else
+    result.code = 0
   end
 
   cmd = original_args.join(" ")
@@ -189,130 +129,9 @@ def test_has_columns(out, *column_names)
 end
 
 
-class Output
-
-  def initialize(output)
-    @output = output
-  end
-
-  def output
-    @output || ""
-  end
-
-  def lines
-    output.split("\n")
-  end
-
-end
-
-class ListOutput < Output
-
-  CELL_DIVIDER = '|'
-
-  def data_lines
-    lines.reject{ |line| line.strip =~ /^[|-]*$/}
-  end
-
-  def column_titles
-    if data_lines.empty?
-      []
-    else
-      data_lines[0].split(CELL_DIVIDER).collect{ |cell| cell.strip.upcase }
-    end
-  end
-
-  def has_column?(name)
-    column_titles.include?(name.upcase)
-  end
-
-end
-
-class ShowOutput < Output
-
-  def has_column?(name)
-    !lines.find{|line| line.upcase.index(name.upcase) }.nil?
-  end
-
-end
 
 
-RAND = Random.rand(100).to_s
-org_name = "Org"+RAND
-os_name = "test_os"+RAND
-user = {
-  :login => "some_user"+RAND,
-  :mail => "some.user@email.com"
-}
 
-section "organization" do
-
-  section "create" do
-    res = hammer "organization", "create", "--name", org_name
-    out = ListOutput.new(res.stdout)
-
-    test "returns ok" do
-      res.ok?
-    end
-  end
-
-end
-
-section "user" do
-
-  section "create" do
-    simple_test "user", "create", "--login", user[:login], "--mail", user[:mail], "--password", "passwd", "--auth-source-id=1"
-  end
-
-  section "assing to organization" do
-    simple_test "organization", "add_user", "--name", org_name, "--user-id", "10"
-  end
-
-end
-
-
-section "operating system" do
-
-  section "create" do
-    simple_test "os", "create", "--name", os_name, "--major", '6', "--minor", "3"
-  end
-
-end
-
-
-section "architecture" do
-
-  section "list" do
-    res = hammer "architecture", "list"
-    out = ListOutput.new(res.stdout)
-
-    test "returns ok" do
-      res.ok?
-    end
-
-    test_has_columns out, "Id", "Name"
-  end
-
-  section "info by id" do
-    res = hammer "architecture", "info", "--id=1"
-    out = ShowOutput.new(res.stdout)
-
-    test "returns ok" do
-      res.ok?
-    end
-
-    test_has_columns out, "Id", "Name", "OS Ids"
-
-  end
-end
-
-section "deletions" do
-
-  section "organization" do
-    simple_test "organization", "delete", "--name", org_name
-  end
-
-  section "user" do
-    simple_test "user", "delete", "--login", user[:login]
-  end
-
+Dir["#{File.join(File.dirname(__FILE__))}/tests/*.rb"].sort.each do |test|
+  require test
 end
