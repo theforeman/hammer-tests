@@ -1,6 +1,5 @@
 #! /usr/bin/env ruby
 
-require 'pry'
 require 'open4'
 require 'colorize'
 require './loggers.rb'
@@ -23,8 +22,6 @@ class CommandResult
     code == 0
   end
 end
-
-
 
 
 
@@ -56,6 +53,14 @@ end
 
 def hammer(*args)
 
+  if (args[-1].is_a? Hash)
+    options = args.pop
+    options.collect do |key, value|
+      args << "--#{key.to_s.gsub('_', '-')}"
+      args << "#{value}"
+    end
+  end
+
   @command_cnt ||= 0
   @command_cnt += 1
 
@@ -65,10 +70,8 @@ def hammer(*args)
   original_args.unshift("hammer")
 
   args.unshift(File.join(File.dirname(__FILE__)) + "/hammer")
-  #args = ["cd /root/hammer/hammer-cli/; bundle exec './bin/hammer "+ args.join(" ") +"'"]
 
   unless DUMMY_RUN
-    # Open3.popen3(*args) do |stdin, stdout, stderr, wait_thr|
     status = Open4.popen4(*args) do |pid, stdin, stdout, stderr|
       result.stdout = stdout.readlines.join("")
       result.stderr = stderr.readlines.join("")

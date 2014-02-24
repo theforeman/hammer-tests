@@ -4,7 +4,9 @@ org_name = "Org"+RAND
 os_name = "test_os"+RAND
 user = {
   :login => "some_user"+RAND,
-  :mail => "some.user@email.com"
+  :mail => "some.user@email.com",
+  :password => "passwd",
+  :auth_source_id => 1
 }
 
 section "organization" do
@@ -23,7 +25,7 @@ end
 section "user" do
 
   section "create" do
-    simple_test "user", "create", "--login", user[:login], "--mail", user[:mail], "--password", "passwd", "--auth-source-id=1"
+    simple_test "user", "create", user
   end
 
   section "assing to organization" do
