@@ -1,7 +1,10 @@
 
 RAND = rand(100).to_s
-org_name = "Org"+RAND
-os_name = "test_os"+RAND
+
+org = {
+  :name => "Org"+RAND
+}
+
 user = {
   :login => "some_user"+RAND,
   :mail => "some.user@email.com",
@@ -9,15 +12,20 @@ user = {
   :auth_source_id => 1
 }
 
+os = {
+  :name => "test_os"+RAND,
+  :major => '6',
+  :minor => '3'
+}
+
+arch = {
+  :name => "arch"+RAND
+}
+
 section "organization" do
 
   section "create" do
-    res = hammer "organization", "create", "--name", org_name
-    out = ListOutput.new(res.stdout)
-
-    test "returns ok" do
-      res.ok?
-    end
+    simple_test "organization", "create", org
   end
 
 end
@@ -29,16 +37,7 @@ section "user" do
   end
 
   section "assing to organization" do
-    simple_test "organization", "add_user", "--name", org_name, "--user-id", "10"
-  end
-
-end
-
-
-section "operating system" do
-
-  section "create" do
-    simple_test "os", "create", "--name", os_name, "--major", '6', "--minor", "3"
+    simple_test "organization", "add_user", "--name", org[:name], "--user-id", "10"
   end
 
 end
@@ -57,8 +56,12 @@ section "architecture" do
     test_has_columns out, "Id", "Name"
   end
 
+  section "create" do
+    simple_test "architecture", "create", arch
+  end
+
   section "info by id" do
-    res = hammer "architecture", "info", "--id=1"
+    res = hammer "architecture", "info", arch.slice(:name)
     out = ShowOutput.new(res.stdout)
 
     test "returns ok" do
@@ -70,14 +73,32 @@ section "architecture" do
   end
 end
 
+
+section "operating system" do
+
+  section "create" do
+    simple_test "os", "create", os
+  end
+
+  section "add architecture" do
+    simple_test "os", "add_architecture", "--id=1", "--architecture", arch[:name]
+  end
+
+end
+
+
 section "deletions" do
 
   section "organization" do
-    simple_test "organization", "delete", "--name", org_name
+    simple_test "organization", "delete", org.slice(:name)
   end
 
   section "user" do
-    simple_test "user", "delete", "--login", user[:login]
+    simple_test "user", "delete", user.slice(:login)
+  end
+
+  section "architecture" do
+    simple_test "architecture", "delete", arch.slice(:name)
   end
 
 end
