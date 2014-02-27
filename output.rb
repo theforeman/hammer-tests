@@ -1,3 +1,5 @@
+require 'csv'
+
 class Output
 
   def initialize(output)
@@ -10,6 +12,52 @@ class Output
 
   def lines
     output.split("\n")
+  end
+
+end
+
+
+class CsvOutput < Output
+
+  def initialize(output)
+    parse(output)
+  end
+
+  def column_titles
+    @titles
+  end
+
+  def has_column?(name)
+    column_titles.include?(name.upcase)
+  end
+
+  def column(name)
+    idx = column_titles.index(name)
+    @rows.map do |row|
+      row[idx]
+    end
+  end
+
+  private
+
+  def parse(output)
+    @titles = nil
+    @rows = []
+    CSV.parse(output) do |row|
+      if @titles.nil?
+        @titles = row
+      else
+        @rows << row
+      end
+    end
+  end
+
+end
+
+class SimpleCsvOutput < CsvOutput
+
+  def column(name)
+    super(name)[0]
   end
 
 end
