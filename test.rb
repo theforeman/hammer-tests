@@ -4,18 +4,12 @@ require 'open4'
 require 'colorize'
 require './loggers.rb'
 require './output.rb'
+require './utils.rb'
 
 #DUMMY_RUN = true
 DUMMY_RUN = false
 
-class Hash
 
-  def slice(*keys)
-    keys.map! { |key| convert_key(key) } if respond_to?(:convert_key, true)
-    keys.each_with_object(self.class.new) { |k, hash| hash[k] = self[k] if has_key?(k) }
-  end
-
-end
 
 class CommandResult
 
@@ -34,20 +28,12 @@ end
 
 
 
-def indent_puts(str)
-  indent = "   "*@current_section.size
-
-  str.split("\n").each do |line|
-    puts indent+line.rstrip
-  end
-end
-
-
 def loggers
   time_prefix = Time.now.strftime("%Y%m%d_%H%M%S").to_s + "_"
   time_prefix = ""
 
   @loggers ||= [
+    OutputLogger.new(),
     LogCropper.new('~/.foreman/log/hammer.log', "./#{time_prefix}hammer.fail.log", true),
     LogCropper.new('~/.foreman/log/hammer.log', "./#{time_prefix}hammer.log"),
     LogCropper.new('~/foreman/log/development.log', "./#{time_prefix}foreman.fail.log", true),
@@ -90,16 +76,8 @@ def hammer(*args)
     result.code = 0
   end
 
-  cmd = original_args.join(" ")
-  cmd = cmd[0, 60] + " ..." if cmd.length > 64
-
-  indent_puts cmd + "    [command ##{@command_cnt}]".cyan
-  unless result.ok?
-    indent_puts result.stderr.rstrip.blue
-  end
-
   loggers.each do |logger|
-    logger.log(original_args.join(" "), @command_cnt, result)
+    logger.log_command(original_args.join(" "), @command_cnt, result, @current_section)
   end
 
   return result
@@ -108,18 +86,19 @@ end
 
 def section(name, &block)
   @current_section ||= []
-  indent_puts name
   @current_section << name
+
+  loggers.each do |logger|
+    logger.log_section(@current_section)
+  end
   yield
   @current_section.pop
 end
 
 def test(desc, &block)
   result = yield
-  if result
-    indent_puts "[ OK ] ".green + desc
-  else
-    indent_puts "[FAIL] ".red + desc
+  loggers.each do |logger|
+    logger.log_test(result, desc, @current_section)
   end
 end
 
@@ -147,3 +126,4 @@ end
 Dir["#{File.join(File.dirname(__FILE__))}/tests/*.rb"].sort.each do |test|
   require test
 end
+
