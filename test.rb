@@ -59,6 +59,9 @@ def hammer(*args)
     end
   end
 
+  #avoid passing nil values
+  args = args.map{|a| a.to_s}
+
   @command_cnt ||= 0
   @command_cnt += 1
 
