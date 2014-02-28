@@ -24,7 +24,7 @@ class CsvOutput < Output
   end
 
   def column_titles
-    @titles
+    @titles || []
   end
 
   def has_column?(name)
@@ -86,8 +86,28 @@ end
 
 class ShowOutput < Output
 
+  def initialize(output)
+    parse(output)
+  end
+
   def has_column?(name)
-    !lines.find{|line| line.upcase.index(name.upcase) }.nil?
+    column_titles.include?(name)
+  end
+
+  def column_titles
+    @content.keys
+  end
+
+  def column(name)
+    @content[name]
+  end
+
+  def parse(output)
+    @content = {}
+    output.split("\n").each do |line|
+      title, value = line.split(":")
+      @content[title.strip] = value.to_s.strip
+    end
   end
 
 end

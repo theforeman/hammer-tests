@@ -16,9 +16,12 @@ user_id = nil
 os = {
   :name => "test_os"+RAND,
   :major => '6',
-  :minor => '3'
+  :minor => '3',
+  :family => 'Redhat',
+  :release_name => 'cheeky'
 }
 os_id = nil
+os_label = "#{os[:name]} #{os[:major]}.#{os[:minor]}"
 
 arch = {
   :name => "arch"+RAND
@@ -37,10 +40,11 @@ template = {
   :file => "#{File.join(File.dirname(__FILE__))}/files/template.txt",
   :type => "provision"
 }
+template_id = nil
 
 medium = {
   :name => "medium"+RAND,
-  :path => "http://mirror.centos.org/centos/$major.$minor/os/$arch",
+  :path => "http://mirror.centos.org/#{RAND}/centos/$major.$minor/os/$arch",
   :os_family => "Redhat"
 }
 medium_id = nil
@@ -99,7 +103,7 @@ section "architecture" do
       res.ok?
     end
 
-    test_has_columns out, "Id", "Name", "OS Ids"
+    test_has_columns out, "Id", "Name", "OS ids"
 
   end
 end
@@ -133,7 +137,15 @@ end
 section "template" do
 
   section "create" do
-    simple_test "template", "create", template
+    res = hammer "--csv", "template", "create", template
+    out = SimpleCsvOutput.new(res.stdout)
+
+    template_id = out.column("Id")
+
+    test "returns ok" do
+      res.ok?
+    end
+
   end
 
 end
@@ -162,7 +174,7 @@ section "operating system" do
   end
 
   section "add template" do
-    simple_test "os", "add_configtemplate", "--id", os_id, "--template", ptable[:name]
+    simple_test "os", "add_configtemplate", "--id", os_id, "--configtemplate", template[:name]
   end
 
   #TODO: add_medium is missing
@@ -170,9 +182,29 @@ section "operating system" do
     simple_test "os", "update", "--id", os_id, "--medium-ids", medium_id
   end
 
-end
+  section "info by id" do
+    res = hammer "os", "info", "--id", os_id
+    out = ShowOutput.new(res.stdout)
 
-exit
+    test "returns ok" do
+      res.ok?
+    end
+
+    test_has_columns out, "Id", "Name", "Release name", "Family"
+    test_has_columns out, "Installation media", "Architectures", "Partition tables", "Config templates", "Parameters"
+
+    test_column_value out, "Id", os_id
+    test_column_value out, "Name", os_label
+    test_column_value out, "Release name", os[:release_name]
+    test_column_value out, "Family", os[:family]
+    test_column_value out, "Installation media", medium[:name]
+    test_column_value out, "Architectures", arch[:name]
+    test_column_value out, "Partition tables", ptable[:name]
+    test_column_value out, "Config templates", template[:name]
+
+  end
+
+end
 
 section "deletions" do
 
@@ -200,6 +232,7 @@ section "deletions" do
 
   section "template" do
     simple_test "template", "delete", template.slice(:name)
+    simple_test "template", "delete", "--id", template_id
   end
 
 

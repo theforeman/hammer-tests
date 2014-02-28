@@ -116,7 +116,11 @@ def test_has_columns(out, *column_names)
   end
 end
 
-
+def test_column_value(out, column_name, value)
+  test "#{column_name} value" do
+    out.column(column_name) == value
+  end
+end
 
 
 
