@@ -69,6 +69,8 @@ def hammer(*args)
 
   args.unshift(File.join(File.dirname(__FILE__)) + "/hammer")
 
+  logger.log_before_command(original_args.join(" "), @command_cnt, @current_section)
+
   unless DUMMY_RUN
     status = Open4.popen4(*args) do |pid, stdin, stdout, stderr|
       result.stdout = stdout.readlines.join("")

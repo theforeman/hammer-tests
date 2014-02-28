@@ -6,6 +6,9 @@ class AbstractLogger
   def put_header
   end
 
+  def log_before_command(command, command_no, section_chain)
+  end
+
   def log_command(command, command_no, result, section_chain)
   end
 
@@ -33,6 +36,12 @@ class LoggerContainer < AbstractLogger
     end
   end
 
+  def log_before_command(*args)
+    loggers.each do |logger|
+      logger.log_before_command(*args)
+    end
+  end
+
   def log_command(*args)
     loggers.each do |logger|
       logger.log_command(*args)
@@ -54,19 +63,7 @@ class LoggerContainer < AbstractLogger
 end
 
 
-class FileLogger
-
-  def put_header
-  end
-
-  def log_command(command, command_no, result, section_chain)
-  end
-
-  def log_section(section_chain)
-  end
-
-  def log_test(status, desc, section_chain)
-  end
+class FileLogger < AbstractLogger
 
   protected
 
@@ -162,13 +159,16 @@ class LogCropper < FileLogger
     put_line
   end
 
+  def log_before_command(command, command_no, section_chain)
+    clear_log
+  end
+
   def log_command(command, command_no, result, section_chain)
     return if @only_fail and result.ok?
     puts
     put_command_header(command, command_no, result)
     puts get_log
     puts
-    clear_log
   end
 
   protected
