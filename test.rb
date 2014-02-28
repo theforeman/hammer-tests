@@ -6,7 +6,7 @@ require './loggers.rb'
 require './output.rb'
 require './utils.rb'
 
-#DUMMY_RUN = true
+# DUMMY_RUN = true
 DUMMY_RUN = false
 
 
@@ -28,22 +28,25 @@ end
 
 
 
-def loggers
+def logger
   time_prefix = Time.now.strftime("%Y%m%d_%H%M%S").to_s + "_"
   time_prefix = ""
 
-  @loggers ||= [
-    OutputLogger.new(),
-    LogCropper.new('~/.foreman/log/hammer.log', "./#{time_prefix}hammer.fail.log", true),
-    LogCropper.new('~/.foreman/log/hammer.log', "./#{time_prefix}hammer.log"),
-    LogCropper.new('~/foreman/log/development.log', "./#{time_prefix}foreman.fail.log", true),
-    LogCropper.new('~/foreman/log/development.log', "./#{time_prefix}foreman.log")
-  ]
+  if @logger.nil?
+    @logger = LoggerContainer.new
+    @logger.loggers = [
+      OutputLogger.new(),
+      OutputLogger.new("./#{time_prefix}test.log"),
+      LogCropper.new('~/.foreman/log/hammer.log', "./#{time_prefix}hammer.fail.log", true),
+      LogCropper.new('~/.foreman/log/hammer.log', "./#{time_prefix}hammer.log"),
+      LogCropper.new('~/foreman/log/development.log', "./#{time_prefix}foreman.fail.log", true),
+      LogCropper.new('~/foreman/log/development.log', "./#{time_prefix}foreman.log")
+    ]
+  end
+  @logger
 end
 
-loggers.each do |logger|
-  logger.put_header
-end
+logger.put_header
 
 
 def hammer(*args)
@@ -76,9 +79,7 @@ def hammer(*args)
     result.code = 0
   end
 
-  loggers.each do |logger|
-    logger.log_command(original_args.join(" "), @command_cnt, result, @current_section)
-  end
+  logger.log_command(original_args.join(" "), @command_cnt, result, @current_section)
 
   return result
 end
@@ -88,18 +89,14 @@ def section(name, &block)
   @current_section ||= []
   @current_section << name
 
-  loggers.each do |logger|
-    logger.log_section(@current_section)
-  end
+  logger.log_section(@current_section)
   yield
   @current_section.pop
 end
 
 def test(desc, &block)
   result = yield
-  loggers.each do |logger|
-    logger.log_test(result, desc, @current_section)
-  end
+  logger.log_test(result, desc, @current_section)
 end
 
 def simple_test(*args)
