@@ -127,9 +127,14 @@ def test_column_value(out, column_name, value)
   end
 end
 
+def test_result(res)
+  test "returns ok" do
+    res.ok?
+  end
+end
 
 
 Dir["#{File.join(File.dirname(__FILE__))}/tests/*.rb"].sort.each do |test|
-  require test
+  load test
 end
 
