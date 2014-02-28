@@ -49,6 +49,14 @@ medium = {
 }
 medium_id = nil
 
+model = {
+  :name => "model"+RAND,
+  :info => "some model info",
+  :hardware_model => "hw0811",
+  :vendor_class => "GPUZC-M"
+}
+model_id = nil
+
 section "organization" do
 
   section "create" do
@@ -151,6 +159,16 @@ section "template" do
 end
 
 
+section "hardware model" do
+
+  section "create" do
+    simple_test "model", "create", model
+  end
+
+end
+
+
+
 section "operating system" do
 
   section "create" do
@@ -230,11 +248,14 @@ section "deletions" do
     simple_test "partition_table", "delete", ptable.slice(:name)
   end
 
+  section "hardware model" do
+    simple_test "model", "delete", model.slice(:name)
+    # simple_test "model", "delete", "--id", template_id
+  end
+
   section "template" do
     simple_test "template", "delete", template.slice(:name)
     simple_test "template", "delete", "--id", template_id
   end
-
-
 
 end
