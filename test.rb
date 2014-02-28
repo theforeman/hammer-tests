@@ -6,9 +6,6 @@ require './loggers.rb'
 require './output.rb'
 require './utils.rb'
 
-# DUMMY_RUN = true
-DUMMY_RUN = false
-
 
 
 class CommandResult
@@ -80,7 +77,6 @@ def logger
   @logger
 end
 
-logger.put_header
 
 
 def hammer(*args)
@@ -108,15 +104,11 @@ def hammer(*args)
 
   logger.log_before_command(original_args.join(" "), @command_cnt, @current_section)
 
-  unless DUMMY_RUN
-    status = Open4.popen4(*args) do |pid, stdin, stdout, stderr|
-      result.stdout = stdout.readlines.join("")
-      result.stderr = stderr.readlines.join("")
-    end
-    result.code = status.exitstatus.to_i
-  else
-    result.code = 0
+  status = Open4.popen4(*args) do |pid, stdin, stdout, stderr|
+    result.stdout = stdout.readlines.join("")
+    result.stderr = stderr.readlines.join("")
   end
+  result.code = status.exitstatus.to_i
 
   logger.log_command(original_args.join(" "), @command_cnt, result, @current_section)
 
@@ -168,6 +160,8 @@ def test_result(res)
   end
 end
 
+
+logger.put_header
 
 Dir["#{File.join(File.dirname(__FILE__))}/tests/*.rb"].sort.each do |test|
   load test
