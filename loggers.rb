@@ -17,6 +17,9 @@ class AbstractLogger
 
   def log_test(status, desc, section_chain)
   end
+
+  def log_statistics(stats)
+  end
 end
 
 class LoggerContainer < AbstractLogger
@@ -57,6 +60,12 @@ class LoggerContainer < AbstractLogger
   def log_test(*args)
     loggers.each do |logger|
       logger.log_test(*args)
+    end
+  end
+
+  def log_statistics(*args)
+    loggers.each do |logger|
+      logger.log_statistics(*args)
     end
   end
 
@@ -127,6 +136,16 @@ class OutputLogger < FileLogger
       indent_puts(colorize("[ OK ] ", :green) + desc, indent)
     else
       indent_puts(colorize("[FAIL] ", :red) + desc, indent)
+    end
+  end
+
+  def log_statistics(stats)
+    puts
+    puts "-" * 80
+    if stats.failure_count == 0
+        puts colorize("#{stats.total} tests, all succeeded", :green)
+    else
+      puts colorize("#{stats.failure_count} out of #{stats.total} tests failed", :red)
     end
   end
 

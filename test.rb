@@ -27,6 +27,40 @@ class CommandResult
 end
 
 
+class Statistics
+
+  def initialize
+    @failures = 0
+    @successes = 0
+  end
+
+  def add_test(result)
+    if result
+      @successes += 1
+    else
+      @failures += 1
+    end
+  end
+
+  def failure_count
+    @failures
+  end
+
+  def success_count
+    @successes
+  end
+
+  def total
+    @failures + @successes
+  end
+
+end
+
+
+def stats
+  @stats ||= Statistics.new
+  @stats
+end
 
 def logger
   time_prefix = Time.now.strftime("%Y%m%d_%H%M%S").to_s + "_"
@@ -101,6 +135,7 @@ end
 
 def test(desc, &block)
   result = yield
+  stats.add_test(result)
   logger.log_test(result, desc, @current_section)
 end
 
@@ -138,3 +173,4 @@ Dir["#{File.join(File.dirname(__FILE__))}/tests/*.rb"].sort.each do |test|
   load test
 end
 
+logger.log_statistics(stats)
