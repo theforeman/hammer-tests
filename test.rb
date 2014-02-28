@@ -36,11 +36,11 @@ def logger
     @logger = LoggerContainer.new
     @logger.loggers = [
       OutputLogger.new(),
-      OutputLogger.new("./#{time_prefix}test.log"),
-      LogCropper.new('~/.foreman/log/hammer.log', "./#{time_prefix}hammer.fail.log", true),
-      LogCropper.new('~/.foreman/log/hammer.log', "./#{time_prefix}hammer.log"),
-      LogCropper.new('~/foreman/log/development.log', "./#{time_prefix}foreman.fail.log", true),
-      LogCropper.new('~/foreman/log/development.log', "./#{time_prefix}foreman.log")
+      OutputLogger.new("./log/#{time_prefix}test.log"),
+      LogCropper.new('~/.foreman/log/hammer.log', "./log/#{time_prefix}hammer.fail.log", true),
+      LogCropper.new('~/.foreman/log/hammer.log', "./log/#{time_prefix}hammer.log"),
+      LogCropper.new('~/foreman/log/development.log', "./log/#{time_prefix}foreman.fail.log", true),
+      LogCropper.new('~/foreman/log/development.log', "./log/#{time_prefix}foreman.log")
     ]
   end
   @logger

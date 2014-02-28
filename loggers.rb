@@ -110,7 +110,9 @@ class OutputLogger < FileLogger
   end
 
   def log_command(command, command_no, result, section_chain)
-    command = command[0, 60] + " ..." if command.length > 64
+    if @target_file.nil?
+      command = command[0, 60] + " ..." if command.length > 64
+    end
     indent = INDENT*section_chain.size
 
     indent_puts(command + colorize("    [command ##{command_no}]", :cyan), indent)

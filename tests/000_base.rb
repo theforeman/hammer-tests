@@ -38,6 +38,13 @@ template = {
   :type => "provision"
 }
 
+medium = {
+  :name => "medium"+RAND,
+  :path => "http://mirror.centos.org/centos/$major.$minor/os/$arch",
+  :os_family => "Redhat"
+}
+medium_id = nil
+
 section "organization" do
 
   section "create" do
@@ -107,6 +114,22 @@ section "partition table" do
 end
 
 
+section "installation medium" do
+
+  section "create" do
+    res = hammer "--csv", "medium", "create", medium
+    out = SimpleCsvOutput.new(res.stdout)
+
+    medium_id = out.column("Id")
+
+    test "returns ok" do
+      res.ok?
+    end
+  end
+
+end
+
+
 section "template" do
 
   section "create" do
@@ -142,8 +165,14 @@ section "operating system" do
     simple_test "os", "add_configtemplate", "--id", os_id, "--template", ptable[:name]
   end
 
+  #TODO: add_medium is missing
+  section "add medium" do
+    simple_test "os", "update", "--id", os_id, "--medium-ids", medium_id
+  end
+
 end
 
+exit
 
 section "deletions" do
 
