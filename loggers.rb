@@ -212,7 +212,8 @@ class LogCropper < FileLogger
   end
 
   def get_log
-    File.readlines(log_file_path)
+    # remove coloring
+    File.readlines(log_file_path).map {|x| x.gsub(/\e\[(\d+)(;\d+)*m/, '')}
   end
 
   def clear_log

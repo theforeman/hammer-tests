@@ -105,7 +105,8 @@ class ShowOutput < Output
   def parse(output)
     @content = {}
     output.split("\n").each do |line|
-      title, value = line.split(":")
+      title, *rest = line.split(":")
+      value = rest.join(":")
       @content[title.strip] = value.to_s.strip
     end
   end

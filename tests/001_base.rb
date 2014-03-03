@@ -49,7 +49,7 @@ section "architecture" do
 
     test_result res
 
-    test_has_columns out, "Id", "Name", "OS id"
+    test_has_columns out, "Id", "Name", "OS ids"
     test_column_value out, "Name", @arch[:name]
   end
 end
@@ -67,7 +67,7 @@ section "partition table" do
 
     test_result res
 
-    test_has_columns out, "Id", "Name", "OS id"
+    test_has_columns out, "Id", "Name", "OS Family"
     test_column_value out, "Name", @ptable[:name]
     test_column_value out, "OS Family", @ptable[:os_family]
   end
@@ -114,7 +114,7 @@ section "installation medium" do
 
 end
 
-
+#FIX: template actions miss --name as identifier
 section "template" do
 
   section "create" do
@@ -128,7 +128,7 @@ section "template" do
 
   #FIX: template id not dumpable by name
   section "dump" do
-    res = hammer "template", "dump", @template.slice(:name)
+    res = hammer "template", "dump", "--id", @template_id
 
     test_result res
 
