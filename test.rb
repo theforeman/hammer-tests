@@ -164,7 +164,13 @@ end
 logger.put_header
 
 Dir["#{File.join(File.dirname(__FILE__))}/tests/*.rb"].sort.each do |test|
-  load test
+  #load test
 end
+
+load './tests/000_fixtures.rb'
+#load './tests/001_base.rb'
+load './tests/002_proxy.rb'
+#load './tests/009_deletions.rb'
+#load './tests/010_listing.rb'
 
 logger.log_statistics(stats)
