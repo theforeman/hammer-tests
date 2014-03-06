@@ -1,0 +1,59 @@
+architecture
+  - update
+    - own fields
+    - associations
+  - show
+    - os ids value
+  - add/remove os
+
+medium
+  - update
+    - own fields
+    - associate os
+
+model
+  - update
+
+organization
+  - info
+    - associations
+  - update
+    - own fields
+
+os
+  - update
+    - own fields
+    - associations
+
+partition_table
+  - update
+  - add/remove os
+
+proxy
+  - update
+
+template
+  - remove from os
+  - info
+
+user
+  - update
+  - location association
+
+domain
+  - update
+  - info
+    - params
+
+NO TESTS YET:
+compute_resource
+environment
+fact
+global_parameter
+host
+hostgroup
+location
+puppet_class
+report
+sc_param
+subnet

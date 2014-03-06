@@ -62,3 +62,18 @@ RAND = rand(100).to_s
   :url => "http://localhost:8443"
 }
 @proxy_id = nil
+
+@domain = {
+  :name => "domain"+RAND,
+  :description => "domain description"
+}
+
+@param_a = {
+  :name => "param_a",
+  :value => "A",
+}
+
+@param_b = {
+  :name => "param_b",
+  :value => "B",
+}

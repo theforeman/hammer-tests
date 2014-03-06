@@ -12,7 +12,7 @@ section "smart proxy" do
   end
 
 
-  section "info by id" do
+  section "info" do
     res = hammer "proxy", "info", @proxy.slice(:name)
     out = ShowOutput.new(res.stdout)
 
