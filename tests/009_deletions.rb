@@ -20,7 +20,7 @@ section "deletions" do
   end
 
   section "partition table" do
-    simple_test "partition_table", "delete", @ptable.slice(:name)
+    simple_test "partition-table", "delete", @ptable.slice(:name)
   end
 
   section "hardware model" do
@@ -30,7 +30,6 @@ section "deletions" do
 
   section "template" do
     simple_test "template", "delete", @template.slice(:name)
-    simple_test "template", "delete", "--id", @template_id
   end
 
 end

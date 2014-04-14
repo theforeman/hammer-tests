@@ -67,7 +67,8 @@ def logger
     @logger = LoggerContainer.new
     @logger.loggers = [
       OutputLogger.new(),
-      OutputLogger.new("./log/#{time_prefix}test.log"),
+      OutputLogger.new("./log/#{time_prefix}test.log", false),
+      OutputLogger.new("./log/#{time_prefix}test.color.log", true),
       LogCropper.new('~/.foreman/log/hammer.log', "./log/#{time_prefix}hammer.fail.log", true),
       LogCropper.new('~/.foreman/log/hammer.log', "./log/#{time_prefix}hammer.log"),
       LogCropper.new('~/foreman/log/development.log', "./log/#{time_prefix}foreman.fail.log", true),
@@ -114,7 +115,6 @@ def hammer(*args)
 
   return result
 end
-
 
 def section(name, &block)
   @current_section ||= []
@@ -168,10 +168,10 @@ Dir["#{File.join(File.dirname(__FILE__))}/tests/*.rb"].sort.each do |test|
 end
 
 load './tests/000_fixtures.rb'
-# load './tests/001_base.rb'
-#load './tests/002_proxy.rb'
+load './tests/001_base.rb'
+load './tests/002_proxy.rb'
 load './tests/003_domain.rb'
-# load './tests/009_deletions.rb'
-# load './tests/010_listing.rb'
+load './tests/009_deletions.rb'
+load './tests/010_listing.rb'
 
 logger.log_statistics(stats)

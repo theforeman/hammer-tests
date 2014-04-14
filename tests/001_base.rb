@@ -21,7 +21,7 @@ section "user" do
 
   # FIX: assign by login
   section "assing to organization" do
-    simple_test "organization", "add_user", "--name", @org[:name], "--user-id", @user_id
+    simple_test "organization", "add-user", "--name", @org[:name], "--user-id", @user_id
   end
 
 end
@@ -57,11 +57,11 @@ end
 section "partition table" do
 
   section "create" do
-    simple_test "partition_table", "create", @ptable
+    simple_test "partition-table", "create", @ptable
   end
 
   section "info" do
-    res = hammer "partition_table", "info", @ptable.slice(:name)
+    res = hammer "partition-table", "info", @ptable.slice(:name)
     out = ShowOutput.new(res.stdout)
 
     test_result res
@@ -73,7 +73,7 @@ section "partition table" do
 
   #FIX: template id not dumpable by name
   section "dump" do
-    res = hammer "partition_table", "dump", @ptable.slice(:name)
+    res = hammer "partition-table", "dump", @ptable.slice(:name)
 
     test_result res
 
@@ -108,7 +108,7 @@ section "installation medium" do
   end
 
   section "assing to organization" do
-    simple_test "organization", "add_medium", "--name", @org[:name], "--medium", @medium[:name]
+    simple_test "organization", "add-medium", "--name", @org[:name], "--medium", @medium[:name]
   end
 
 end
@@ -137,7 +137,7 @@ section "template" do
   end
 
   section "assing to organization" do
-    simple_test "organization", "add_configtemplate", "--name", @org[:name], "--configtemplate", @template[:name]
+    simple_test "organization", "add-config-template", "--name", @org[:name], "--config-template", @template[:name]
   end
 
 end
@@ -166,18 +166,18 @@ section "operating system" do
   end
 
   section "add architecture" do
-    simple_test "os", "add_architecture", "--id", @os_id, "--architecture", @arch[:name]
+    simple_test "os", "add-architecture", "--id", @os_id, "--architecture", @arch[:name]
   end
 
   section "add partition table" do
-    simple_test "os", "add_ptable", "--id", @os_id, "--ptable", @ptable[:name]
+    simple_test "os", "add-ptable", "--id", @os_id, "--ptable", @ptable[:name]
   end
 
   section "add template" do
-    simple_test "os", "add_configtemplate", "--id", @os_id, "--configtemplate", @template[:name]
+    simple_test "os", "add-config-template", "--id", @os_id, "--config-template", @template[:name]
   end
 
-  #TODO: add_medium is missing
+  #TODO: add-medium is missing
   section "add medium" do
     simple_test "os", "update", "--id", @os_id, "--medium-ids", @medium_id
   end

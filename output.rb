@@ -33,6 +33,7 @@ class CsvOutput < Output
 
   def column(name)
     idx = column_titles.index(name)
+    return [] if idx.nil?
     @rows.map do |row|
       row[idx]
     end

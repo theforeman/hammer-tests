@@ -110,8 +110,9 @@ class OutputLogger < FileLogger
 
   INDENT = "   "
 
-  def initialize(target_file=nil)
+  def initialize(target_file=nil, use_colors=true)
     @target_file = target_file
+    @use_colors = use_colors
     clear_target
   end
 
@@ -152,7 +153,7 @@ class OutputLogger < FileLogger
   protected
 
   def colorize(str, color)
-    if @target_file.nil?
+    if @use_colors
       str.send(color)
     else
       str

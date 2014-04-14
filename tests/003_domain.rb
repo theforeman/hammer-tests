@@ -8,11 +8,11 @@ section "domain" do
   end
 
   section "parameters" do
-    res = hammer "domain", "set_parameter", "--domain-name", @domain[:name], @param_a
+    res = hammer "domain", "set-parameter", "--domain", @domain[:name], @param_a
     test_result res
-    res = hammer "domain", "set_parameter", "--domain-name", @domain[:name], @param_b
+    res = hammer "domain", "set-parameter", "--domain", @domain[:name], @param_b
     test_result res
-    res = hammer "domain", "delete_parameter", "--domain-name", @domain[:name], @param_b.slice(:name)
+    res = hammer "domain", "delete-parameter", "--domain", @domain[:name], @param_b.slice(:name)
     test_result res
   end
 
