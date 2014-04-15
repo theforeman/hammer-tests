@@ -7,7 +7,7 @@ section "deletions" do
 
   section "user" do
     #TODO: delete by login
-    simple_test "user", "delete", "--id", @user_id
+    simple_test "user", "delete", @user.slice(:login)
   end
 
   section "architecture" do
@@ -25,7 +25,6 @@ section "deletions" do
 
   section "hardware model" do
     simple_test "model", "delete", @model.slice(:name)
-    # simple_test "model", "delete", "--id", @template_id
   end
 
   section "template" do

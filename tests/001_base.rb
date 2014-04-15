@@ -19,9 +19,17 @@ section "user" do
     test_result res
   end
 
-  # FIX: assign by login
   section "assing to organization" do
-    simple_test "organization", "add-user", "--name", @org[:name], "--user-id", @user_id
+    simple_test "organization", "add-user", "--name", @org[:name], "--user", @user[:login]
+  end
+
+  section "info" do
+    res = hammer "user", "info", @user.slice(:login)
+    out = ShowOutput.new(res.stdout)
+
+    test_result res
+
+    test_has_columns out, "Id", "Login", "Name", "Email"
   end
 
 end
@@ -71,7 +79,6 @@ section "partition table" do
     test_column_value out, "OS Family", @ptable[:os_family]
   end
 
-  #FIX: template id not dumpable by name
   section "dump" do
     res = hammer "partition-table", "dump", @ptable.slice(:name)
 
@@ -113,7 +120,7 @@ section "installation medium" do
 
 end
 
-#FIX: template actions miss --name as identifier
+
 section "template" do
 
   section "create" do
@@ -125,9 +132,19 @@ section "template" do
     test_result res
   end
 
-  #FIX: template id not dumpable by name
+  section "info" do
+    res = hammer "template", "info", @template.slice(:name)
+    out = ShowOutput.new(res.stdout)
+
+    test_result res
+
+    test_has_columns out, "Id", "Name", "Type", "OS ids"
+    test_column_value out, "Name", @template[:name]
+    test_column_value out, "Type", @template[:type]
+  end
+
   section "dump" do
-    res = hammer "template", "dump", "--id", @template_id
+    res = hammer "template", "dump", @template.slice(:name)
 
     test_result res
 
@@ -147,6 +164,18 @@ section "hardware model" do
 
   section "create" do
     simple_test "model", "create", @model
+  end
+
+  section "info" do
+    res = hammer "model", "info", @model.slice(:name)
+    out = ShowOutput.new(res.stdout)
+
+    test_result res
+
+    test_has_columns out, "Id", "Name", "Vendor class", "HW model", "Info"
+    test_column_value out, "Name", @model[:name]
+    test_column_value out, "HW model", @model[:hardware_model]
+    test_column_value out, "Vendor class", @model[:vendor_class]
   end
 
 end
