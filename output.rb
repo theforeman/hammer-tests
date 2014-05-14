@@ -108,7 +108,7 @@ class ShowOutput < Output
     output.split("\n").each do |line|
       title, *rest = line.split(":")
       value = rest.join(":")
-      @content[title.strip] = value.to_s.strip
+      @content[title.to_s.strip] = value.to_s.strip
     end
   end
 

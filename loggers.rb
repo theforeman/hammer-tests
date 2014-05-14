@@ -1,6 +1,4 @@
 
-#TODO: solve file deletion
-
 class AbstractLogger
 
   def put_header
@@ -140,13 +138,15 @@ class OutputLogger < FileLogger
     end
   end
 
-  def log_statistics(stats)
+  def log_statistics(stat_lists)
     puts
     puts "-" * 80
-    if stats.failure_count == 0
-        puts colorize("#{stats.total} tests, all succeeded", :green)
-    else
-      puts colorize("#{stats.failure_count} out of #{stats.total} tests failed", :red)
+    stat_lists.each do |stats|
+      if stats.failure_count == 0
+        puts colorize("#{stats.name}: #{stats.total} in total, all succeeded", :green)
+      else
+        puts colorize("#{stats.name}: #{stats.failure_count} out of #{stats.total} failed", :red)
+      end
     end
   end
 
