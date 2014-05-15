@@ -112,7 +112,7 @@ def hammer(*args)
 
   logger.log_command(original_args.join(" "), @command_cnt, result, current_section)
 
-  cmd_stats.add_test(result)
+  cmd_stats.add_test(result.ok?)
   return result
 end
 
