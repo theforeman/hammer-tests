@@ -3,7 +3,7 @@ Hammer Tests
 
 Simple tool for testing integration of Hammer CLI with Foreman.
 
-It runs defined tests and crops relevant chunks from Foreman's and Hammer's log files.
+It runs defined tests and crops relevant chunks from Foreman's and Hammer's log files.  
 __BEWARE:__ It does modifications on the machine your Hammer is configured against!
 
 Usage
@@ -12,6 +12,11 @@ Usage
 ./test.rb <LIST_OF_PATHS>
 ```
 The script accepts list of test files or directories with test files as arguments.
+
+E.g. to run all available tests from this repo:
+```
+./test.rb ./tests/
+```
 
 
 Env Variable Settings
