@@ -12,7 +12,7 @@ test_files = []
 ARGV.each do|a|
   a = File.expand_path(a)
   if File.directory?(a)
-    Dir.glob("#{a}/*.rb") do |file|
+    Dir.glob("#{a}/*.rb").sort.each do |file|
       test_files << file if File.file?(file)
     end
   elsif File.file?(a)
