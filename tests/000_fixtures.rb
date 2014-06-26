@@ -77,3 +77,19 @@ RAND = rand(100).to_s
   :name => "param_b",
   :value => "B",
 }
+
+@role = {
+  :name => "role"+RAND
+}
+@new_role_name = @role[:name]+'_2'
+
+@filter = {
+  :role => @new_role_name,
+  :permission_ids => '1,2,3',
+  :search => 'architecture.id=1'
+}
+
+@updated_filter = {
+  :permission_ids => '3,4',
+  :search => 'architecture.id=2'
+}
