@@ -36,7 +36,7 @@ end
 
 # Load the test files
 test_files.each do |f|
-  load f
+  require f
 end
 
 logger.log_statistics([cmd_stats, stats])
