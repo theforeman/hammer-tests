@@ -26,7 +26,7 @@ Env Variable Settings
 - `HT_TIMESTAMPED_LOGS` - use timestamps in names of the output log files, set to 1 to enable the functionality (disabled by default)
 - `HT_LOGS_LOCATION` - target location for the output logs (default is `./log/`)
 - `HT_FOREMAN_LOG_FILE` - path to the Foreman's log (default is `/var/log/foreman/development.log`)
-- `HT_HAMMER_LOG_FILE` - path to the Hammer's log (default is `~/.foreman/log/hammer.log`)
+- `HT_HAMMER_LOG_FILE` - path to the Hammer's log (default is `~/.hammer/log/hammer.log`)
 
 Writing Tests
 -------------
