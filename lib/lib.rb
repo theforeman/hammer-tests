@@ -1,4 +1,6 @@
-require './loggers.rb'
+require File.join(File.dirname(__FILE__), 'utils')
+require File.join(File.dirname(__FILE__), 'output')
+require File.join(File.dirname(__FILE__), 'loggers')
 
 class CommandResult
 
@@ -58,9 +60,8 @@ def logger
   end
 
   log_location = ENV['HT_LOGS_LOCATION'] || "./log/"
-  hammer_log_file = ENV['HT_HAMMER_LOG_FILE'] || "~/.foreman/log/hammer.log"           # '~/.foreman/log/hammer.log'
-  foreman_log_file = ENV['HT_FOREMAN_LOG_FILE'] || "/var/log/foreman/development.log"  # '~/foreman/log/development.log'
-
+  hammer_log_file = ENV['HT_HAMMER_LOG_FILE'] || "~/.hammer/log/hammer.log"
+  foreman_log_file = ENV['HT_FOREMAN_LOG_FILE'] || "/var/log/foreman/development.log"
 
   if @logger.nil?
     @logger = LoggerContainer.new

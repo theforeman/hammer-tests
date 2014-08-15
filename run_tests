@@ -3,9 +3,7 @@
 require 'rubygems'
 require 'open4'
 require 'colorize'
-require './lib.rb'
-require './output.rb'
-require './utils.rb'
+require File.join(File.dirname(__FILE__), 'lib/lib') 
 
 #
 # Available environment variables:
@@ -14,11 +12,11 @@ require './utils.rb'
 # HT_TIMESTAMPED_LOGS - use timestamps in names of the output log files, set to 1 to enable the functionality (disabled by default)
 # HT_LOGS_LOCATION    - target location for the output logs (default is ./log/)
 # HT_FOREMAN_LOG_FILE - path to the Foreman's log (default is /var/log/foreman/development.log)
-# HT_HAMMER_LOG_FILE  - path to the Hammer's log (default is ~/.foreman/log/hammer.log)
+# HT_HAMMER_LOG_FILE  - path to the Hammer's log (default is ~/.hammer/log/hammer.log)
 #
 # Example usage:
 #
-# HT_HAMMER_CMD=./hammer HT_FOREMAN_LOG_FILE=~/foreman/log/development.log ./test.rb ./tests/
+# HT_HAMMER_CMD=./hammer HT_FOREMAN_LOG_FILE=~/foreman/log/development.log ./run_tests ./tests/
 #
 
 

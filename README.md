@@ -9,13 +9,13 @@ __BEWARE:__ It does modifications on the machine your Hammer is configured again
 Usage
 -----
 ```
-./test.rb <LIST_OF_PATHS>
+./run_tests <LIST_OF_PATHS>
 ```
 The script accepts list of test files or directories with test files as arguments.
 
 E.g. to run all available tests from this repo:
 ```
-./test.rb ./tests/
+./run_tests ./tests/
 ```
 
 
