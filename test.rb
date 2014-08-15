@@ -1,5 +1,6 @@
-#! /usr/bin/env ruby
+#!/usr/bin/ruby
 
+require 'rubygems'
 require 'open4'
 require 'colorize'
 require './lib.rb'
