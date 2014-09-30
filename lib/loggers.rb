@@ -223,3 +223,39 @@ class LogCropper < FileLogger
   end
 
 end
+
+
+class TapLogger < FileLogger
+
+  def initialize(target_file=nil)
+    @target_file = target_file
+    @counter = 0
+    @buffer = []
+    clear_target
+  end
+
+  def log_command(command, command_no, result, section_chain)
+    desc = "#{command} [command #{command_no}]"
+    desc += "\n" + result.stderr.rstrip unless result.ok?
+    log_tap(result.ok?, desc, section_chain)
+  end
+
+  def log_test(status, desc, section_chain)
+    log_tap(status, desc, section_chain)
+  end
+
+  def log_statistics(stat_lists)
+    puts "1..#{@counter}"
+    @buffer.each { |b| puts b }
+  end
+
+  protected
+
+  def log_tap(status, desc, section_chain)
+    @counter += 1
+    @buffer << "#{status ? 'ok' : 'not ok'} #{@counter} #{(section_chain.clone << desc.split("\n").first).join(' | ')}"
+    cont = desc.split("\n")[1..-1].map { |d| '  ' + d }
+    @buffer << cont.join("\n") unless cont.empty?
+  end
+
+end
