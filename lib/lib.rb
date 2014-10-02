@@ -69,6 +69,7 @@ def logger
       OutputLogger.new(),
       OutputLogger.new("#{log_location}/#{time_prefix}test.log", false),
       OutputLogger.new("#{log_location}/#{time_prefix}test.color.log", true),
+      TapLogger.new("#{log_location}/#{time_prefix}test.tap"),
       LogCropper.new(hammer_log_file, "#{log_location}/#{time_prefix}hammer.fail.log", true),
       LogCropper.new(hammer_log_file, "#{log_location}/#{time_prefix}hammer.log"),
       LogCropper.new(foreman_log_file, "#{log_location}/#{time_prefix}foreman.fail.log", true),
