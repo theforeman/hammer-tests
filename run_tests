@@ -38,4 +38,6 @@ test_files.each do |f|
   require f
 end
 
-logger.log_statistics([cmd_stats, stats])
+all_stats = [cmd_stats, stats]
+logger.log_statistics(all_stats)
+exit(all_stats.any? {|s| !s.failure_count.zero? } ? 1 : 0)
