@@ -105,10 +105,18 @@ class ShowOutput < Output
 
   def parse(output)
     @content = {}
+    last_title = nil
+
     output.split("\n").each do |line|
-      title, *rest = line.split(":")
-      value = rest.join(":")
-      @content[title.to_s.strip] = value.to_s.strip
+      if line.start_with?(" ")
+        @content[last_title] << "\n" unless @content[last_title].empty?
+        @content[last_title] << line.strip
+      else
+        title, *rest = line.split(":")
+        value = rest.join(":")
+        last_title = title.to_s.strip
+        @content[last_title] = value.strip
+      end
     end
   end
 

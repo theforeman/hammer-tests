@@ -56,7 +56,7 @@ section "architecture" do
 
     test_result res
 
-    test_has_columns out, "Id", "Name", "OS ids"
+    test_has_columns out, "Id", "Name", "Operating systems"
     test_column_value out, "Name", @arch[:name]
   end
 end
@@ -108,7 +108,7 @@ section "installation medium" do
 
     test_result res
 
-    test_has_columns out, "Id", "Path", "OS Family", "OS IDs", "OSs"
+    test_has_columns out, "Id", "Path", "OS Family", "Operating systems"
     test_column_value out, "Name", @medium[:name]
     test_column_value out, "OS Family", @medium[:os_family]
     test_column_value out, "Path", @medium[:path]
@@ -138,7 +138,7 @@ section "template" do
 
     test_result res
 
-    test_has_columns out, "Id", "Name", "Type", "OS ids"
+    test_has_columns out, "Id", "Name", "Type", "Operating systems"
     test_column_value out, "Name", @template[:name]
     test_column_value out, "Type", @template[:type]
   end
@@ -218,16 +218,17 @@ section "operating system" do
     test_result res
 
     test_has_columns out, "Id", "Name", "Release name", "Family"
-    test_has_columns out, "Installation media", "Architectures", "Partition tables", "Config templates", "Parameters"
+    test_has_columns out, "Installation media", "Architectures", "Partition tables", "Templates", "Parameters"
 
     test_column_value out, "Id", @os_id
-    test_column_value out, "Name", @os_label
+    test_column_value out, "Full name", @os_label
+    test_column_value out, "Name", @os[:name]
     test_column_value out, "Release name", @os[:release_name]
     test_column_value out, "Family", @os[:family]
     test_column_value out, "Installation media", @medium[:name]
     test_column_value out, "Architectures", @arch[:name]
     test_column_value out, "Partition tables", @ptable[:name]
-    test_column_value out, "Config templates", @template[:name]
+    test_column_value out, "Templates", @template[:name] + " (provision)"
 
   end
 
