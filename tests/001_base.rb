@@ -221,7 +221,7 @@ section "operating system" do
     test_has_columns out, "Installation media", "Architectures", "Partition tables", "Templates", "Parameters"
 
     test_column_value out, "Id", @os_id
-    test_column_value out, "Full name", @os_label
+    test_column_value out, "Title", @os_label
     test_column_value out, "Name", @os[:name]
     test_column_value out, "Release name", @os[:release_name]
     test_column_value out, "Family", @os[:family]
