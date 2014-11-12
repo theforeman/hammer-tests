@@ -156,7 +156,7 @@ section "operating system" do
   end
 
   section "add partition table" do
-    simple_test "os", "add-ptable", "--id", @os_id, "--ptable", @ptable[:name]
+    simple_test "os", "add-ptable", "--id", @os_id, "--partition-table", @ptable[:name]
   end
 
   section "add template" do
