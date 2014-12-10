@@ -57,9 +57,10 @@ RAND = rand(100).to_s
 }
 @model_id = nil
 
+@hostname = `hostname`.strip
 @proxy = {
   :name => "proxy"+RAND,
-  :url => "http://localhost:8443"
+  :url => "https://#{@hostname}:8443"
 }
 @proxy_id = nil
 
