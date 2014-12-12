@@ -19,7 +19,7 @@ section "user" do
     test_result res
   end
 
-  section "assing to organization" do
+  section "assign to organization" do
     simple_test "organization", "add-user", "--name", @org[:name], "--user", @user[:login]
   end
 
@@ -50,15 +50,6 @@ section "architecture" do
     simple_test "architecture", "create", @arch
   end
 
-  section "info" do
-    res = hammer "architecture", "info", @arch.slice(:name)
-    out = ShowOutput.new(res.stdout)
-
-    test_result res
-
-    test_has_columns out, "Id", "Name", "Operating systems"
-    test_column_value out, "Name", @arch[:name]
-  end
 end
 
 
@@ -66,17 +57,6 @@ section "partition table" do
 
   section "create" do
     simple_test "partition-table", "create", @ptable
-  end
-
-  section "info" do
-    res = hammer "partition-table", "info", @ptable.slice(:name)
-    out = ShowOutput.new(res.stdout)
-
-    test_result res
-
-    test_has_columns out, "Id", "Name", "OS Family"
-    test_column_value out, "Name", @ptable[:name]
-    test_column_value out, "OS Family", @ptable[:os_family]
   end
 
   section "dump" do
@@ -102,19 +82,7 @@ section "installation medium" do
     test_result res
   end
 
-  section "info" do
-    res = hammer "medium", "info", @medium.slice(:name)
-    out = ShowOutput.new(res.stdout)
-
-    test_result res
-
-    test_has_columns out, "Id", "Path", "OS Family", "Operating systems"
-    test_column_value out, "Name", @medium[:name]
-    test_column_value out, "OS Family", @medium[:os_family]
-    test_column_value out, "Path", @medium[:path]
-  end
-
-  section "assing to organization" do
+  section "assign to organization" do
     simple_test "organization", "add-medium", "--name", @org[:name], "--medium", @medium[:name]
   end
 
@@ -132,17 +100,6 @@ section "template" do
     test_result res
   end
 
-  section "info" do
-    res = hammer "template", "info", @template.slice(:name)
-    out = ShowOutput.new(res.stdout)
-
-    test_result res
-
-    test_has_columns out, "Id", "Name", "Type", "Operating systems"
-    test_column_value out, "Name", @template[:name]
-    test_column_value out, "Type", @template[:type]
-  end
-
   section "dump" do
     res = hammer "template", "dump", @template.slice(:name)
 
@@ -153,7 +110,7 @@ section "template" do
     end
   end
 
-  section "assing to organization" do
+  section "assign to organization" do
     simple_test "organization", "add-config-template", "--name", @org[:name], "--config-template", @template[:name]
   end
 
@@ -199,7 +156,7 @@ section "operating system" do
   end
 
   section "add partition table" do
-    simple_test "os", "add-ptable", "--id", @os_id, "--ptable", @ptable[:name]
+    simple_test "os", "add-ptable", "--id", @os_id, "--partition-table", @ptable[:name]
   end
 
   section "add template" do
@@ -234,3 +191,66 @@ section "operating system" do
 
 end
 
+
+section "architecture" do
+
+  section "info" do
+    res = hammer "architecture", "info", @arch.slice(:name)
+    out = ShowOutput.new(res.stdout)
+
+    test_result res
+
+    test_has_columns out, "Id", "Name", "Operating systems"
+    test_column_value out, "Name", @arch[:name]
+    test_column_value out, "Operating systems", @os_label
+  end
+
+end
+
+section "installation medium" do
+
+  section "info" do
+    res = hammer "medium", "info", @medium.slice(:name)
+    out = ShowOutput.new(res.stdout)
+
+    test_result res
+
+    test_has_columns out, "Id", "Path", "OS Family", "Operating systems"
+    test_column_value out, "Name", @medium[:name]
+    test_column_value out, "OS Family", @medium[:os_family]
+    test_column_value out, "Operating systems", @os_label
+    test_column_value out, "Path", @medium[:path]
+  end
+
+end
+
+section "partition table" do
+
+  section "info" do
+    res = hammer "partition-table", "info", @ptable.slice(:name)
+    out = ShowOutput.new(res.stdout)
+
+    test_result res
+
+    test_has_columns out, "Id", "Name", "OS Family"
+    test_column_value out, "Name", @ptable[:name]
+    test_column_value out, "OS Family", @ptable[:os_family]
+    test_column_value out, "Operating systems", @os_label
+  end
+
+end
+
+section "template" do
+  section "info" do
+    res = hammer "template", "info", @template.slice(:name)
+    out = ShowOutput.new(res.stdout)
+
+    test_result res
+
+    test_has_columns out, "Id", "Name", "Type", "Operating systems"
+    test_column_value out, "Name", @template[:name]
+    test_column_value out, "Type", @template[:type]
+    test_column_value out, "Operating systems", @os_label
+  end
+
+end
