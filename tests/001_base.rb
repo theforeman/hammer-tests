@@ -1,4 +1,33 @@
 
+def test_os_association(resource, params)
+
+  section "add/remove os" do
+    simple_test resource, "add-operatingsystem", "--operatingsystem", @os_label, params
+
+    test "os associated" do
+      res = hammer resource, "info", params
+      out = ShowOutput.new(res.stdout)
+
+      test_result res
+
+      test_column_value out, "Operating systems", @os_label
+    end
+
+    simple_test resource, "remove-operatingsystem", "--operatingsystem", @os_label, params
+  end
+
+end
+
+
+def test_org_association(resource, params)
+  section "assign to organization" do
+    simple_test "organization", "add-#{resource}", "--name", @org[:name], params
+    simple_test "organization", "remove-#{resource}", "--name", @org[:name], params
+  end
+end
+
+
+
 section "organization" do
 
   section "create" do
@@ -19,9 +48,7 @@ section "user" do
     test_result res
   end
 
-  section "assign to organization" do
-    simple_test "organization", "add-user", "--name", @org[:name], "--user", @user[:login]
-  end
+  test_org_association("user", :user => @user[:login])
 
   section "info" do
     res = hammer "user", "info", @user.slice(:login)
@@ -53,6 +80,21 @@ section "architecture" do
 end
 
 
+section "operating system" do
+
+  section "create" do
+    res = hammer "--csv", "os", "create", @os
+    out = SimpleCsvOutput.new(res.stdout)
+
+    @os_id = out.column("Id")
+
+    test_result res
+
+  end
+
+end
+
+
 section "partition table" do
 
   section "create" do
@@ -68,6 +110,9 @@ section "partition table" do
       res.stdout.strip == "PARTITION LAYOUT"
     end
   end
+
+  test_os_association("partition-table", :name => @ptable[:name])
+
 end
 
 
@@ -82,9 +127,8 @@ section "installation medium" do
     test_result res
   end
 
-  section "assign to organization" do
-    simple_test "organization", "add-medium", "--name", @org[:name], "--medium", @medium[:name]
-  end
+  test_org_association("medium", :medium => @medium[:name])
+  test_os_association("medium", :name => @medium[:name])
 
 end
 
@@ -110,8 +154,11 @@ section "template" do
     end
   end
 
-  section "assign to organization" do
-    simple_test "organization", "add-config-template", "--name", @org[:name], "--config-template", @template[:name]
+  test_org_association("config-template", 'config-template' => @template[:name])
+  test_os_association("template", :name => @template[:name])
+
+  section "kinds" do
+    simple_test "template", "kinds"
   end
 
 end
@@ -140,16 +187,6 @@ end
 
 
 section "operating system" do
-
-  section "create" do
-    res = hammer "--csv", "os", "create", @os
-    out = SimpleCsvOutput.new(res.stdout)
-
-    @os_id = out.column("Id")
-
-    test_result res
-
-  end
 
   section "add architecture" do
     simple_test "os", "add-architecture", "--id", @os_id, "--architecture", @arch[:name]
