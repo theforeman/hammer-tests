@@ -71,7 +71,7 @@ section "workflow around filters" do
 
     section "prints warning when override is true and taxonomies are used" do
       # TODO: find a way of accepting hammer failures
-      res = hammer  "filter", "create", @filter.merge(@taxonomies)
+      res = hammer "filter", "create", @filter.merge(@taxonomies)
 
       test "prints warning" do
         res.stderr.include?("Error: Organizations and locations can be set only for overriding filters")
@@ -95,6 +95,33 @@ section "workflow around filters" do
         ['Override?:', 'no'],
         ['Role:', @role[:name]],
         ['Permissions:', 'view_users, create_users, edit_users, destroy_users']
+      ])
+    end
+  end
+
+  section "switch a filter to overriding one" do
+    @filter_update = {
+      :override => "yes"
+    }.merge(@taxonomies)
+
+    simple_test "filter", "update", "--id", @filter1_id, @filter_update
+
+    res = hammer "filter", "info", "--id", @filter1_id
+    out = ShowOutput.new(res.stdout)
+
+    test "info output" do
+      out.matches?([
+        ['Id:', /[0-9]+/],
+        ['Resource type:', 'User'],
+        ['Search:', 'none'],
+        ['Unlimited?:', 'no'],
+        ['Override?:', 'yes'],
+        ['Role:', @role[:name]],
+        ['Permissions:', 'view_users, create_users, edit_users, destroy_users'],
+        ['Locations:'],
+        ["    #{@loc[:name]}"],
+        ['Organizations:'],
+        ["    #{@org[:name]}"]
       ])
     end
   end
@@ -131,29 +158,26 @@ section "workflow around filters" do
     end
   end
 
-  section "switch a filter to overriding one" do
+  section "switch a filter to non-overriding one" do
     @filter_update = {
-      :override => "yes"
-    }.merge(@taxonomies)
+      :override => "false"
+    }
 
-    simple_test "filter", "update", "--id", @filter1_id, @filter_update
+    simple_test "filter", "update", "--id", @filter2_id, @filter_update
 
-    res = hammer "filter", "info", "--id", @filter1_id
+    res = hammer "filter", "info", "--id", @filter2_id
     out = ShowOutput.new(res.stdout)
 
-    test "info output" do
+    test "it resets taxonomies" do
       out.matches?([
         ['Id:', /[0-9]+/],
         ['Resource type:', 'User'],
         ['Search:', 'none'],
         ['Unlimited?:', 'yes'],
-        ['Override?:', 'yes'],
+        ['Override?:', 'no'],
         ['Role:', @role[:name]],
         ['Permissions:', 'view_users, create_users, edit_users, destroy_users'],
-        ['Locations:'],
-        ["    #{@loc[:name]}"],
-        ['Organizations:'],
-        ["    #{@org[:name]}"]
+        ['Created at:']
       ])
     end
   end
