@@ -73,7 +73,8 @@ def logger
       LogCropper.new(hammer_log_file, "#{log_location}/#{time_prefix}hammer.fail.log", true),
       LogCropper.new(hammer_log_file, "#{log_location}/#{time_prefix}hammer.log"),
       LogCropper.new(foreman_log_file, "#{log_location}/#{time_prefix}foreman.fail.log", true),
-      LogCropper.new(foreman_log_file, "#{log_location}/#{time_prefix}foreman.log")
+      LogCropper.new(foreman_log_file, "#{log_location}/#{time_prefix}foreman.log"),
+      HammerOutputLogger.new("#{log_location}/#{time_prefix}hammer.out.log")
     ]
   end
   @logger
@@ -81,7 +82,7 @@ end
 
 
 
-def hammer(*args)
+def hammer(*args, &block)
 
   if (args[-1].is_a? Hash)
     options = args.pop
@@ -107,6 +108,7 @@ def hammer(*args)
   logger.log_before_command(original_args.join(" "), @command_cnt, current_section)
 
   status = Open4.popen4(*args) do |pid, stdin, stdout, stderr|
+    yield(stdin, stdout, stderr) if block_given?
     result.stdout = stdout.readlines.join("")
     result.stderr = stderr.readlines.join("")
   end
@@ -137,8 +139,8 @@ def test(desc, &block)
   logger.log_test(result, desc, current_section)
 end
 
-def simple_test(*args)
-  res = hammer *args
+def simple_test(*args, &block)
+  res = hammer *args, &block
 
   test "returns ok" do
     res.ok?

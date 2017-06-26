@@ -130,11 +130,15 @@ class OutputLogger < FileLogger
   end
 
   def log_test(status, desc, section_chain)
+    status, *messages = status
     indent = INDENT*(section_chain.size)
     if status
-      indent_puts(colorize("[ OK ] ", :green) + desc, indent)
+      indent_puts(colorize("[ OK ]  ", :green) + desc, indent)
     else
-      indent_puts(colorize("[FAIL] ", :red) + desc, indent)
+      indent_puts(colorize("[FAIL]  ", :red) + desc, indent)
+    end
+    if !messages.empty?
+      indent_puts(colorize(messages.join("\n"), :blue), indent + " "*8 )
     end
   end
 
@@ -162,6 +166,37 @@ class OutputLogger < FileLogger
 
 end
 
+
+class HammerOutputLogger < FileLogger
+  def initialize(target_file, only_fail=false)
+    @target_file = target_file
+    @only_fail = only_fail
+    clear_target
+  end
+
+  def log_command(command, command_no, result, section_chain)
+    return if @only_fail and result.ok?
+    puts
+    put_command_header(command, command_no, result)
+  end
+
+  protected
+
+  def put_command_header(command, command_no, result)
+    put_line "command ##{command_no}"
+    puts command
+    puts result.stdout.split("\n")
+    put_line
+  end
+
+  def put_line(text="")
+    text = " #{text} " unless text.empty?
+    length = 100 - text.length
+
+    line = "--#{text}" + "-"*length
+    puts line % text
+  end
+end
 
 class LogCropper < FileLogger
 
@@ -252,6 +287,7 @@ class TapLogger < FileLogger
   protected
 
   def log_tap(status, desc, section_chain)
+    status, *messages = status
     @counter += 1
     @buffer << "#{status ? 'ok' : 'not ok'} #{@counter} #{(section_chain.clone << desc.split("\n").first).join(' | ')}"
     cont = desc.split("\n")[1..-1].map { |d| '  ' + d }
