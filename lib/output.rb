@@ -83,12 +83,30 @@ class ListOutput < Output
     column_titles.include?(name.upcase)
   end
 
+  def contains_line?(cells)
+    regexp = line_regexp(cells)
+    lines.any? { |l| regexp =~ l }
+  end
+
+  protected
+  def line_regexp(expected_cells)
+    re = expected_cells.map do |column|
+      if column.nil?
+        '[^\|]*'
+      elsif column.is_a?(Regexp)
+        "[ ]*#{column.source}[ ]*"
+      else
+        "[ ]*#{Regexp.quote(column.to_s)}[ ]*"
+      end
+    end.join('\|').gsub(/(\[\ \]\*)+/, '[ ]*')
+    Regexp.new(re)
+  end
 end
 
 class ShowOutput < Output
-
   def initialize(output)
     parse(output)
+    @output = output
   end
 
   def has_column?(name)
@@ -101,6 +119,40 @@ class ShowOutput < Output
 
   def column(name)
     @content[name]
+  end
+
+  def matches?(columns)
+    @output.split("\n").each do |line|
+      return true if columns.empty?
+      matcher = columns.shift
+      if matcher.nil?
+        next
+      elsif matcher.is_a?(Regexp)
+        return false, "Line '#{line}' didn't match #{matcher.source}" if line !~ matcher
+      elsif matcher.is_a?(Array)
+        return false, "Line '#{line}' didn't match #{line_regexp(matcher).source}" if line_regexp(matcher) !~ line
+      else
+        return false, "Line '#{line}' didn't equal #{matcher}" if line != matcher
+      end
+    end
+    true
+  end
+
+  protected
+
+  def line_regexp(items)
+    if items.empty?
+      Regexp.new('.*')
+    else
+      re = items.map do |i|
+        if i.is_a?(Regexp)
+          "[ ]*#{i.source}[ ]*"
+        else
+          "[ ]*#{Regexp.quote(i.to_s)}[ ]*"
+        end
+      end.join('').gsub(/(\[\ \]\*)+/, '[ ]*')
+      Regexp.new(re)
+    end
   end
 
   def parse(output)
@@ -119,5 +171,4 @@ class ShowOutput < Output
       end
     end
   end
-
 end
