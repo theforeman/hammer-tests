@@ -2,6 +2,9 @@ require File.join(File.dirname(__FILE__), 'utils')
 require File.join(File.dirname(__FILE__), 'output')
 require File.join(File.dirname(__FILE__), 'loggers')
 
+
+@stop_on_failure = (ENV['HT_STOP_ON_FAILURE'] == 'true')
+
 class CommandResult
 
   def initialize(code = nil, stdout = "", stderr = "")
@@ -23,23 +26,27 @@ class Statistics
   def initialize(name)
     @name = name
     @failure_count = 0
+    @expected_failure_count = 0
     @success_count = 0
   end
 
-  attr_accessor :name, :success_count, :failure_count
+  attr_accessor :name, :success_count, :failure_count, :expected_failure_count
 
-  def add_test(result)
+  def add_test(result, expected_failure=false)
     if result
       @success_count += 1
     else
-      @failure_count += 1
+      if expected_failure
+        @expected_failure_count += 1
+      else
+        @failure_count += 1
+      end
     end
   end
 
   def total
-    @failure_count + @success_count
+    @failure_count + @success_count + @expected_failure_count
   end
-
 end
 
 
@@ -85,11 +92,9 @@ end
 def hammer(*args, &block)
 
   if (args[-1].is_a? Hash)
-    options = args.pop
-    options.collect do |key, value|
-      args << "--#{key.to_s.gsub('_', '-')}"
-      args << "#{value}"
-    end
+    args += args.pop.to_opts
+  elsif (args[-1].is_a? Array)
+    args += args.pop
   end
 
   #avoid passing nil values
@@ -117,6 +122,8 @@ def hammer(*args, &block)
   logger.log_command(original_args.join(" "), @command_cnt, result, current_section)
 
   cmd_stats.add_test(result.ok?)
+  raise "Stopping on a test failure..." if !result.ok? && @stop_on_failure
+
   return result
 end
 
@@ -137,6 +144,8 @@ def test(desc, &block)
   result = yield
   stats.add_test(result)
   logger.log_test(result, desc, current_section)
+
+  raise "Stopping on a test failure..." if !result && @stop_on_failure
 end
 
 def simple_test(*args, &block)

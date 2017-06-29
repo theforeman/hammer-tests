@@ -60,26 +60,31 @@ section "workflow around users" do
     end
 
 
-    section "change user's password" do
+    section "change user's password to new_passwd" do
       simple_test "user", "update", "--login", @user[:login], '--ask-password', 'true' do |stdin, *_|
         stdin.puts "new_passwd"
         stdin.close
       end
     end
 
+    # TODO: expected failure
     section "change your own password" do
-      simple_test "-u", @user[:login], '-p', 'opice', "user", "update", "--login", @user[:login], '--ask-password', 'true' do |stdin, *_|
-        stdin.puts "new_passwd"
+      simple_test "-u", @user[:login], '-p', 'new_passwd', "user", "update", "--login", @user[:login], '--ask-password', 'true' do |stdin, *_|
+        # Enter user's new password:
         stdin.puts "new_passwd2"
+        # Enter user's current password:
+        stdin.puts "new_passwd"
         stdin.close
       end
     end
 
     section "change your own password with view_permissions" do
       simple_test 'user', 'add-role', '--login', @user[:login], '--role', 'Viewer'
-      simple_test "-u", @user[:login], '-p', 'opice', "user", "update", "--login", @user[:login], '--ask-password', 'true' do |stdin, *_|
-        stdin.puts "new_passwd"
+      simple_test "-u", @user[:login], '-p', 'new_passwd', "user", "update", "--login", @user[:login], '--ask-password', 'true' do |stdin, *_|
+        # Enter user's new password:
         stdin.puts "new_passwd2"
+        # Enter user's current password:
+        stdin.puts "new_passwd"
         stdin.close
       end
     end

@@ -29,9 +29,9 @@ section "workflow around filters" do
 
   section "create new empty role" do
 
-    simple_test "role", "create", @role
+    simple_test "role", "create", @role.to_opts
 
-    res = hammer "role", "info", @role.slice(:name)
+    res = hammer "role", "info", @role.slice(:name).to_opts
     out = ShowOutput.new(res.stdout)
 
     test "info output" do
@@ -71,14 +71,14 @@ section "workflow around filters" do
 
     section "prints warning when override is true and taxonomies are used" do
       # TODO: find a way of accepting hammer failures
-      res = hammer "filter", "create", @filter.merge(@taxonomies)
+      res = hammer "filter", "create", @filter.merge(@taxonomies).to_opts
 
       test "prints warning" do
         res.stderr.include?("Error: Organizations and locations can be set only for overriding filters")
       end
     end
 
-    res = hammer "--output", "csv", "filter", "create", @filter
+    res = hammer "--output", "csv", "filter", "create", @filter.to_opts
     out = SimpleCsvOutput.new(res.stdout)
 
     @filter1_id = out.column("Id")
@@ -104,7 +104,7 @@ section "workflow around filters" do
       :override => "yes"
     }.merge(@taxonomies)
 
-    simple_test "filter", "update", "--id", @filter1_id, @filter_update
+    simple_test "filter", "update", "--id", @filter1_id, @filter_update.to_opts
 
     res = hammer "filter", "info", "--id", @filter1_id
     out = ShowOutput.new(res.stdout)
@@ -133,7 +133,7 @@ section "workflow around filters" do
       :permissions => "view_users,create_users,edit_users,destroy_users"
     }.merge(@taxonomies)
 
-    res = hammer "--output", "csv", "filter", "create", @filter
+    res = hammer "--output", "csv", "filter", "create", @filter.to_opts
     out = SimpleCsvOutput.new(res.stdout)
 
     @filter2_id = out.column("Id")
@@ -163,7 +163,7 @@ section "workflow around filters" do
       :override => "false"
     }
 
-    simple_test "filter", "update", "--id", @filter2_id, @filter_update
+    simple_test "filter", "update", "--id", @filter2_id, @filter_update.to_opts
 
     res = hammer "filter", "info", "--id", @filter2_id
     out = ShowOutput.new(res.stdout)
