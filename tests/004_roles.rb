@@ -29,11 +29,11 @@ section "filter" do
 
   section "available permissions and resources" do
 
-    test "permissions" do
+    section "permissions" do
       simple_test "filter", "available-permissions"
     end
 
-    test "resources" do
+    section "resources" do
       simple_test "filter", "available-resources"
     end
 

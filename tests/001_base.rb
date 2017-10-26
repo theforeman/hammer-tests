@@ -4,7 +4,7 @@ def test_os_association(resource, params)
   section "add/remove os" do
     simple_test resource, "add-operatingsystem", "--operatingsystem", @os_label, params
 
-    test "os associated" do
+    section "os associated" do
       res = hammer resource, "info", params
       out = ShowOutput.new(res.stdout)
 
